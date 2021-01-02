@@ -13,7 +13,7 @@ const
             acc[curr] = curr;
             return acc;
         }, {}),
-    excluded = command_line_args.excluded.split(',').map(el => el.trim()) || ['node_modules', '.idea', 'polyfills.ts', 'environment.prod.ts', 'environment.ts', 'wrap-imports-with-regions'],
+    excluded = command_line_args.excluded?.split(',').map(el => el.trim()) || ['node_modules', '.idea', 'polyfills.ts', 'environment.prod.ts', 'environment.ts', 'wrap-imports-with-regions'],
     no_emit = command_line_args.noEmit || false,
     start_dir = command_line_args.startFolder || path.dirname(require.main.filename),
     extension = command_line_args.extension || '.ts',
@@ -76,7 +76,7 @@ all_ts_files.forEach(filename => {
     let last_import_index = 0;
 
     file_arr.forEach((el, index) => {
-        const regExp = /^import\s(.+|\*\sas\s.+)\sfrom\s'.+'/;
+        const regExp = /import\s+(.+|\*\s+as\s+.+|)\s+from\s+(\'|\").+(\'|\")/;
         if (regExp.test(el)) {
             last_import_index = index + 1;
         }
