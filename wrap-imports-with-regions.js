@@ -1,7 +1,6 @@
 const
     path = require('path'),
     fs = require('fs'),
-    excluded = ['node_modules', '.idea', 'wrap-imports-with-regions'],
     command_line_args = process.argv
         .slice(2) // ignore node and script name go straight to args
         .reduce((acc, curr) => { // create dictionary from argv array
@@ -14,6 +13,7 @@ const
             acc[curr] = curr;
             return acc;
         }, {}),
+    excluded = command_line_args.excluded.split(',').map(el => el.trim()) || ['node_modules', '.idea', 'polyfills.ts', 'environment.prod.ts', 'environment.ts', 'wrap-imports-with-regions'],
     no_emit = command_line_args.noEmit || false,
     start_dir = command_line_args.startFolder || path.dirname(require.main.filename),
     extension = command_line_args.extension || '.ts',
@@ -28,7 +28,7 @@ const logger = new Proxy({
     success: (...messages) => console.log("\x1b[32m%s\x1b[0m", ...messages),
     _raw: console.log
 }, {
-    get: function (target, prop, receiver) {
+    get: function (target, prop) {
         if (no_emit) {
             return logger[prop] = function () {
             };
@@ -39,7 +39,7 @@ const logger = new Proxy({
     }
 });
 
-function fromDir(startPath, filter) {
+function aggregateAllFilesByExtension(startPath, filter) {
     const files = fs.readdirSync(startPath);
 
     for (let i = 0; i < files.length; i++) {
@@ -47,12 +47,13 @@ function fromDir(startPath, filter) {
             filename = path.join(startPath, files[i]),
             stat = fs.lstatSync(filename);
 
-        if (excluded.some(ex => filename.includes(ex))) {
+        if (excluded.some(ex => files[i].includes(ex))) {
+            logger.info(`[!] ignoring ${files[i]}`);
             continue;
         }
 
         if (stat?.isDirectory()) {
-            fromDir(filename, filter);
+            aggregateAllFilesByExtension(filename, filter);
         } else if (filename.endsWith(filter)) {
             logger.info(`[!] found typescript file: ${filename}`);
             all_ts_files.push(filename);
@@ -61,7 +62,7 @@ function fromDir(startPath, filter) {
     }
 }
 
-fromDir(start_dir, extension);
+aggregateAllFilesByExtension(start_dir, extension);
 
 all_ts_files.forEach(filename => {
 
@@ -70,13 +71,16 @@ all_ts_files.forEach(filename => {
             return name.slice(name.lastIndexOf('/') + 1);
         },
         file = fs.readFileSync(filename, "utf8"),
-        file_arr = file.split(/\r?\n/),
-        last_import_index = file_arr
-            .indexOf(file_arr
-                .concat()
-                .reverse()
-                .find(el => /(import .+ from \'.+\')||(import \* as .+ from \'.+\')/.test(el))
-            ) + 1;
+        file_arr = file.split(/\r?\n/);
+
+    let last_import_index = 0;
+
+    file_arr.forEach((el, index) => {
+        const regExp = /^import\s(.+|\*\sas\s.+)\sfrom\s'.+'/;
+        if (regExp.test(el)) {
+            last_import_index = index + 1;
+        }
+    });
 
     logger.warn(`-- attempting to format: ${getFileName()}`);
 
@@ -109,7 +113,6 @@ all_ts_files.forEach(filename => {
         logger.success(`The imports in ${getFileName()} were successfully wrapped with regions`);
     } else {
         logger.error(`${getFileName()} is empty`);
-        return;
     }
 
 });

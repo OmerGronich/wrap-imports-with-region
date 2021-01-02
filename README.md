@@ -31,9 +31,10 @@ collapsed, it will only show the word `imports`
 
 ## Arguments
 
-| arguments     | description                                | default value  | usage examples|
-| ------------- |:------------------------------------------:| --------------:|-----------------------------------------------------------:|
-| `noEmit`      | Disables logs                              |`false`         |`node wrap-imports-with-regions.js noEmit` <img width=300/> |
-| `extension`   | File extension to run the script on.       |`.ts`           |`node wrap-imports-with-regions.js extension=.js`           |
-| `startFolder` | folder to start searching from             |`root folder`   |`node wrap-imports-with-regions.js startFolder=sub-dir`     |
-| `regionText`  | what word is shown when region is collapse |`imports`       |`node wrap-imports-with-regions.js regionText='CUSTOM TEXT'`|
+| arguments     | description                                  | default value                                                                                                        | usage examples                                                                            |
+| ------------- |:--------------------------------------------:| --------------------------------------------------------------------------------------------------------------------:|------------------------------------------------------------------------------------------:|
+| `noEmit`      | Disables logs                                |`false`                                                                                                               |`node wrap-imports-with-regions.js noEmit` <img width=300/>                                |
+| `extension`   | File extension to run the script on.         |`.ts`                                                                                                                 |`node wrap-imports-with-regions.js extension=.js`                                          |
+| `startFolder` | folder to start searching from               |`root folder`                                                                                                         |`node wrap-imports-with-regions.js startFolder=sub-dir`                                    |
+| `regionText`  | what word is shown when region is collapse   |`imports`                                                                                                             |`node wrap-imports-with-regions.js regionText='CUSTOM TEXT'`                               |
+| `excluded`    | ignores file that match the pattern provided |`node_modules, .idea, polyfills.ts, environment.prod.ts, environment.ts, wrap-imports-with-regions`       |`node wrap-imports-with-regions.js excluded='environment.ts, polyfills.ts, node_modules'`  |
