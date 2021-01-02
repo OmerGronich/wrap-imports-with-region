@@ -76,7 +76,7 @@ all_ts_files.forEach(filename => {
     let last_import_index = 0;
 
     file_arr.forEach((el, index) => {
-        const regExp = /import\s+(.+|\*\s+as\s+.+|)\s+from\s+(\'|\").+(\'|\")/;
+        const regExp = /import\s+(.+|\*\s+as\s+.+|)\s+from\s+['"].+['"]/;
         if (regExp.test(el)) {
             last_import_index = index + 1;
         }
